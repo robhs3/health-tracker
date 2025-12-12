@@ -9,20 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-public class HelloController {
+public class DailyMetricController {
 
     // In-memory list to store daily metrics
     private final List<DailyMetric> metrics = new ArrayList<>();
-
-    @GetMapping("/api/hello")
-    public String hello() {
-        return "Hello Rob, your health tracker backend is running!";
-    }
-
-    @GetMapping("/api/sample-metric")
-    public DailyMetric sampleMetric() {
-        return new DailyMetric("2025-12-11", 168.2, 2600, 180);
-    }
 
     // Get all logged daily metrics
     @GetMapping("/api/daily-metrics")
