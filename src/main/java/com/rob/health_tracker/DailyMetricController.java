@@ -34,4 +34,10 @@ public class DailyMetricController {
         metrics.add(metric);
         return metric;
     }
+
+    @GetMapping("/api/health")
+    public String health() {
+        return "ok";
+}
+
 }
