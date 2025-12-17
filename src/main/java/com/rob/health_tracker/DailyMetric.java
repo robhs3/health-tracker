@@ -1,7 +1,16 @@
 package com.rob.health_tracker;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+
+@Entity
 public class DailyMetric {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private String date;
     private double weight;
     private int calories;
@@ -34,6 +43,10 @@ public class DailyMetric {
 
     public int getProtein() {
         return protein;
+    }
+
+    public Long getId() {
+    return id;
     }
 
     // Setters
