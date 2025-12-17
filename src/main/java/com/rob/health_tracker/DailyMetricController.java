@@ -1,38 +1,36 @@
 package com.rob.health_tracker;
 
+import java.util.List;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @RestController
 public class DailyMetricController {
 
-    // In-memory list to store daily metrics
-    private final List<DailyMetric> metrics = new ArrayList<>();
+    private final DailyMetricService dailyMetricService;
+
+    public DailyMetricController(DailyMetricService dailyMetricService) {
+        this.dailyMetricService = dailyMetricService;
+    }
 
     // Get all logged daily metrics
     @GetMapping("/api/daily-metrics")
     public List<DailyMetric> getAllMetrics() {
-        return metrics;
+        return dailyMetricService.getAll();
     }
 
     @GetMapping("/api/daily-metrics/latest")
     public DailyMetric getLatestMetric() {
-        if (metrics.isEmpty()) {
-            return null; // no metrics yet
-        }
-        return metrics.get(metrics.size() - 1);
+        return dailyMetricService.getLatest();
     }
 
     // Add a new daily metric (from JSON)
     @PostMapping("/api/daily-metrics")
     public DailyMetric addMetric(@RequestBody DailyMetric metric) {
-        metrics.add(metric);
-        return metric;
+        return dailyMetricService.add(metric);
     }
 
     @GetMapping("/api/health")
