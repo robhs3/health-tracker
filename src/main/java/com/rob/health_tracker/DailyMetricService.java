@@ -34,4 +34,8 @@ public class DailyMetricService {
         }
         return results.get(0);
     }
+
+    public void deleteAll() {
+        dailyMetricRepository.deleteAll();
+}
 }

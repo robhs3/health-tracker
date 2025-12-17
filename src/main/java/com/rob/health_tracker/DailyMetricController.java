@@ -7,12 +7,20 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api")
 public class DailyMetricController {
 
     private final DailyMetricService dailyMetricService;
+
+    @Value("${app.dev-reset-enabled:false}")
+    private boolean devResetEnabled;
+
 
     public DailyMetricController(DailyMetricService dailyMetricService) {
         this.dailyMetricService = dailyMetricService;
@@ -38,6 +46,15 @@ public class DailyMetricController {
     @GetMapping("/health")
     public String health() {
         return "ok";
-}
+    }
+
+    @DeleteMapping("/daily-metrics")
+    public void deleteAllMetrics() {
+        if (!devResetEnabled) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Dev reset endpoint is disabled");
+        }
+        dailyMetricService.deleteAll();
+    }
+
 
 }
