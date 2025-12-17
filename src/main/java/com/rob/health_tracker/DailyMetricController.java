@@ -6,8 +6,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @RestController
+@RequestMapping("/api")
 public class DailyMetricController {
 
     private final DailyMetricService dailyMetricService;
@@ -17,23 +19,23 @@ public class DailyMetricController {
     }
 
     // Get all logged daily metrics
-    @GetMapping("/api/daily-metrics")
+    @GetMapping("/daily-metrics")
     public List<DailyMetric> getAllMetrics() {
         return dailyMetricService.getAll();
     }
 
-    @GetMapping("/api/daily-metrics/latest")
+    @GetMapping("/daily-metrics/latest")
     public DailyMetric getLatestMetric() {
         return dailyMetricService.getLatest();
     }
 
     // Add a new daily metric (from JSON)
-    @PostMapping("/api/daily-metrics")
+    @PostMapping("/daily-metrics")
     public DailyMetric addMetric(@RequestBody DailyMetric metric) {
         return dailyMetricService.add(metric);
     }
 
-    @GetMapping("/api/health")
+    @GetMapping("/health")
     public String health() {
         return "ok";
 }
