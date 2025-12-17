@@ -8,8 +8,8 @@ import java.time.LocalDate;
 import jakarta.persistence.Column;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
-
-
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 public class DailyMetric {
@@ -18,11 +18,17 @@ public class DailyMetric {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull
     @Column(columnDefinition = "TEXT")
     private LocalDate date;
-    
+
+    @Min(0)
     private double weight;
+
+    @Min(0)
     private int calories;
+
+    @Min(0)
     private int protein;
 
     // Required no-arg constructor for JSON deserialization

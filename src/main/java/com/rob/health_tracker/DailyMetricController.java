@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.server.ResponseStatusException;
+import jakarta.validation.Valid;
+
 
 @RestController
 @RequestMapping("/api")
@@ -39,7 +41,7 @@ public class DailyMetricController {
 
     // Add a new daily metric (from JSON)
     @PostMapping("/daily-metrics")
-    public DailyMetric addMetric(@RequestBody DailyMetric metric) {
+    public DailyMetric addMetric(@Valid @RequestBody DailyMetric metric) {
         return dailyMetricService.add(metric);
     }
 
