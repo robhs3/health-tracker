@@ -4,6 +4,12 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import java.time.LocalDate;
+import jakarta.persistence.Column;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
+
+
 
 @Entity
 public class DailyMetric {
@@ -11,7 +17,10 @@ public class DailyMetric {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String date;
+
+    @Column(columnDefinition = "TEXT")
+    private LocalDate date;
+    
     private double weight;
     private int calories;
     private int protein;
@@ -21,7 +30,7 @@ public class DailyMetric {
     }
 
     // Convenience constructor
-    public DailyMetric(String date, double weight, int calories, int protein) {
+    public DailyMetric(LocalDate date, double weight, int calories, int protein) {
         this.date = date;
         this.weight = weight;
         this.calories = calories;
@@ -29,8 +38,8 @@ public class DailyMetric {
     }
 
     // Getters
-    public String getDate() {
-        return date;
+    public LocalDate getDate() {
+    return date;
     }
 
     public double getWeight() {
@@ -50,8 +59,8 @@ public class DailyMetric {
     }
 
     // Setters
-    public void setDate(String date) {
-        this.date = date;
+    public void setDate(LocalDate date) {
+    this.date = date;
     }
 
     public void setWeight(double weight) {
