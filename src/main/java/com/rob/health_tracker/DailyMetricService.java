@@ -2,8 +2,9 @@ package com.rob.health_tracker;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
+import java.time.LocalDate;
+
 
 @Service
 public class DailyMetricService {
@@ -26,14 +27,13 @@ public class DailyMetricService {
 
     public DailyMetric getLatest() {
         // Fetch the most recent metric by date (works best once date is a real date type)
-        List<DailyMetric> results =
-                dailyMetricRepository.findAll(Sort.by(Sort.Direction.DESC, "date"));
-
-        if (results.isEmpty()) {
-            return null;
-        }
-        return results.get(0);
+        return dailyMetricRepository.findTopByOrderByDateDesc();
     }
+
+    public List<DailyMetric> getBetween(LocalDate from, LocalDate to) {
+        return dailyMetricRepository.findByDateBetweenOrderByDateAsc(from, to);
+    }
+
 
     public void deleteAll() {
         dailyMetricRepository.deleteAll();

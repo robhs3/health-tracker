@@ -12,6 +12,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.server.ResponseStatusException;
 import jakarta.validation.Valid;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import java.time.LocalDate;
+
 
 
 @RestController
@@ -30,9 +35,17 @@ public class DailyMetricController {
 
     // Get all logged daily metrics
     @GetMapping("/daily-metrics")
-    public List<DailyMetric> getAllMetrics() {
+    public List<DailyMetric> getAllMetrics(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to
+    ) {
+        if (from != null && to != null) {
+            return dailyMetricService.getBetween(from, to);
+        }
+
         return dailyMetricService.getAll();
     }
+
 
     @GetMapping("/daily-metrics/latest")
     public DailyMetric getLatestMetric() {
