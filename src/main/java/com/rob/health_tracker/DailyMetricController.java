@@ -46,7 +46,6 @@ public class DailyMetricController {
         return dailyMetricService.getAll();
     }
 
-
     @GetMapping("/daily-metrics/latest")
     public DailyMetric getLatestMetric() {
         return dailyMetricService.getLatest();
@@ -56,6 +55,14 @@ public class DailyMetricController {
     @PostMapping("/daily-metrics")
     public DailyMetric addMetric(@Valid @RequestBody DailyMetric metric) {
         return dailyMetricService.add(metric);
+    }
+
+    @GetMapping("/daily-metrics/stats")
+    public DailyMetricStats getStats(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to
+    ) {
+        return dailyMetricService.getStatsBetween(from, to);
     }
 
     @GetMapping("/health")

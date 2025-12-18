@@ -34,6 +34,30 @@ public class DailyMetricService {
         return dailyMetricRepository.findByDateBetweenOrderByDateAsc(from, to);
     }
 
+    public DailyMetricStats getStatsBetween(LocalDate from, LocalDate to) {
+        List<DailyMetric> metrics = getBetween(from, to);
+
+        int count = metrics.size();
+        if (count == 0) {
+            return new DailyMetricStats(0, 0.0, 0.0, null, null, null);
+        }
+
+        double avgCalories = metrics.stream()
+                .mapToInt(DailyMetric::getCalories)
+                .average()
+                .orElse(0.0);
+
+        double avgProtein = metrics.stream()
+                .mapToInt(DailyMetric::getProtein)
+                .average()
+                .orElse(0.0);
+
+        Double startWeight = metrics.get(0).getWeight();
+        Double endWeight = metrics.get(count - 1).getWeight();
+        Double weightChange = endWeight - startWeight;
+
+        return new DailyMetricStats(count, avgCalories, avgProtein, startWeight, endWeight, weightChange);
+    }
 
     public void deleteAll() {
         dailyMetricRepository.deleteAll();
