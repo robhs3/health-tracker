@@ -65,6 +65,14 @@ public class DailyMetricController {
         return dailyMetricService.getStatsBetween(from, to);
     }
 
+    @GetMapping("/trends/weight")
+    public TrendResponseDto getWeightTrend(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to
+    ) {
+        return dailyMetricService.getWeightTrend(from, to);
+    }
+
     @GetMapping("/health")
     public String health() {
         return "ok";
