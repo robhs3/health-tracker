@@ -12,6 +12,11 @@ This project is intentionally minimal and is being developed incrementally as a 
 - Retrieve all logged metrics
 - Retrieve the most recently logged metric
 - Health check endpoint for service monitoring
+- Retrieve health metrics between dates
+- Retrieve health stats between dates
+- SQLite integration for data persistence
+- Validation for health metric inputs
+- WebMVC controller slice tests (MockMvc) for GET endpoints (happy path)
 ---
 
 ## API Endpoints
@@ -23,6 +28,12 @@ Returns `ok` if the server is running.
 
 ### Get All Daily Metrics
 `GET /api/daily-metrics`
+
+### Get Latest Daily Metric
+`GET /api/daily-metrics/latest`
+
+### Get Daily Metrics Between Dates
+`GET /api/daily-metrics?from=YYYY-MM-DD&to=YYYY-MM-DD`
 
 ### Add a Daily Metric
 `POST /api/daily-metrics`
@@ -37,16 +48,16 @@ Example request body:
 }
 ```
 
-### Get Latest Daily Metric
-`GET /api/daily-metrics/latest`
+### Get Health Stats Between Dates
+`GET /api/daily-metrics/stats?from=YYYY-MM-DD&to=YYYY-MM-DD`
 
 ## Tech Stack
-- Java 21
-- Spring Boot
+- Java 17
+- Spring Boot 4
 - Maven
 - RESTful API
-- In-memory storage (temporary)
-- Layered architecture (controller -> service)
+- SQLite and JPA
+- Layered architecture (controller -> service -> repository)
 
 ## Running the Project Locally
 
@@ -56,9 +67,9 @@ Example request body:
 
 http://localhost:8080
 
+## Testing
+Controller-level WebMVC slice tests are implemented for GET endpoints to validate routing, parameter binding, and successful responses using mocked service dependencies.
+
 ## Future Improvements
-- Persist data using a database (SQLite or PostgreSQL)
-- Add validation for inputs
-- Introduce a repository layer
 - Build a simple frontend for data entry and visualization
 
