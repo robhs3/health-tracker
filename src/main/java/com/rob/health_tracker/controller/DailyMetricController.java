@@ -1,4 +1,4 @@
-package com.rob.health_tracker;
+package com.rob.health_tracker.controller;
 
 import java.util.List;
 
@@ -11,6 +11,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.server.ResponseStatusException;
+
+import com.rob.health_tracker.dto.DailyMetricStats;
+import com.rob.health_tracker.dto.TrendResponseDto;
+import com.rob.health_tracker.entity.DailyMetric;
+import com.rob.health_tracker.service.DailyMetricService;
+
 import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.RequestParam;

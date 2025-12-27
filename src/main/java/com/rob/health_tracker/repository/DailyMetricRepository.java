@@ -1,6 +1,9 @@
-package com.rob.health_tracker;
+package com.rob.health_tracker.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.rob.health_tracker.entity.DailyMetric;
+
 import java.time.LocalDate;
 import java.util.List;
 

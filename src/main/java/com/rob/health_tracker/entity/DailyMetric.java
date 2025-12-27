@@ -1,4 +1,4 @@
-package com.rob.health_tracker;
+package com.rob.health_tracker.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

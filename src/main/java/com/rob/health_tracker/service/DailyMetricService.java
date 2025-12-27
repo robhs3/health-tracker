@@ -1,4 +1,4 @@
-package com.rob.health_tracker;
+package com.rob.health_tracker.service;
 
 import org.apache.coyote.BadRequestException;
 import org.springframework.data.domain.Sort;
@@ -6,6 +6,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+
+import com.rob.health_tracker.dto.DailyMetricStats;
+import com.rob.health_tracker.dto.TrendPointDto;
+import com.rob.health_tracker.dto.TrendResponseDto;
+import com.rob.health_tracker.dto.TrendSummaryDto;
+import com.rob.health_tracker.entity.DailyMetric;
+import com.rob.health_tracker.repository.DailyMetricRepository;
 
 import java.util.ArrayList;
 import java.util.List;

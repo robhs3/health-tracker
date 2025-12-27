@@ -1,4 +1,4 @@
-package com.rob.health_tracker;
+package com.rob.health_tracker.dto;
 
 public class TrendSummaryDto {
     private final Double start;

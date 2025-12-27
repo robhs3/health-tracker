@@ -1,4 +1,4 @@
-package com.rob.health_tracker;
+package com.rob.health_tracker.controller;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -6,6 +6,11 @@ import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+
+import com.rob.health_tracker.controller.DailyMetricController;
+import com.rob.health_tracker.dto.DailyMetricStats;
+import com.rob.health_tracker.entity.DailyMetric;
+import com.rob.health_tracker.service.DailyMetricService;
 
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;

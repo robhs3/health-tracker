@@ -1,4 +1,4 @@
-package com.rob.health_tracker;
+package com.rob.health_tracker.exception;
 
 import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
