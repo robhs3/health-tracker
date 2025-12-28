@@ -19,6 +19,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.List;
 import java.time.LocalDate;
 
+import static org.hamcrest.Matchers.nullValue;
+
 @WebMvcTest(DailyMetricController.class)
 class DailyMetricControllerTest {
 
@@ -35,14 +37,42 @@ class DailyMetricControllerTest {
                 .andExpect(status().isOk());      
     }
 
+
     @Test
     void getDailyMetricsAll_returns200() throws Exception {
         given(dailyMetricService.getAll()).willReturn(List.of());
+        
         mockMvc.perform(get("/api/daily-metrics")
-            .accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk())
-            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()").value(0));
     }
+
+
+    @Test
+    void getDailyMetricsAll_returnsDtos_withoutId() throws Exception {
+        given(dailyMetricService.getAll()).willReturn(List.of(
+                new DailyMetricResponseDto(LocalDate.of(2025, 1, 1), 165.2, 2800, 150),
+                new DailyMetricResponseDto(LocalDate.of(2025, 1, 2), 165.0, 2750, 155)
+        ));
+
+        mockMvc.perform(get("/api/daily-metrics")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()").value(2))
+
+                // element 0 fields
+                .andExpect(jsonPath("$[0].date").value("2025-01-01"))
+                .andExpect(jsonPath("$[0].weight").value(165.2))
+                .andExpect(jsonPath("$[0].calories").value(2800))
+                .andExpect(jsonPath("$[0].protein").value(150))
+                .andExpect(jsonPath("$[0].id").doesNotExist());
+    }
+
 
     @Test
     void getDailyMetricsBetween_validRequest_returns200() throws Exception {
@@ -51,11 +81,15 @@ class DailyMetricControllerTest {
 
         given(dailyMetricService.getBetween(from, to)).willReturn(List.of());
 
-        mockMvc.perform(get("/api/daily-metrics").param("from", from.toString()).param("to", to.toString())
+        mockMvc.perform(get("/api/daily-metrics")
+                .param("from", from.toString())
+                .param("to", to.toString())
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$").isArray());;
     }
+
 
     @Test
     void getDailyMetricsLatest_returns200() throws Exception {
@@ -65,12 +99,18 @@ class DailyMetricControllerTest {
                                                         2800,
                                                         150
         ));
-        
+
         mockMvc.perform(get("/api/daily-metrics/latest")
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+            .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.date").value("2025-01-01"))
+            .andExpect(jsonPath("$.weight").value(165.2))
+            .andExpect(jsonPath("$.calories").value(2800))
+            .andExpect(jsonPath("$.protein").value(150))
+            .andExpect(jsonPath("$.id").doesNotExist());
     }
+
 
     @Test
     void getDailyMetricsStats_validRequest_returns200() throws Exception {
@@ -82,7 +122,13 @@ class DailyMetricControllerTest {
         mockMvc.perform(get("/api/daily-metrics/stats").param("from", "2000-01-01").param("to", "2025-12-31")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));      
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.countDays").value(0))
+                .andExpect(jsonPath("$.avgCalories").value(0.0))
+                .andExpect(jsonPath("$.avgProtein").value(0.0))
+                .andExpect(jsonPath("$.startWeight").value(nullValue()))
+                .andExpect(jsonPath("$.endWeight").value(nullValue()))
+                .andExpect(jsonPath("$.weightChange").value(nullValue()));      
     }
     
 }
