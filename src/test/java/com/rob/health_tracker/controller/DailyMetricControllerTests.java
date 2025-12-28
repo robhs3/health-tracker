@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.rob.health_tracker.controller.DailyMetricController;
+import com.rob.health_tracker.dto.DailyMetricResponseDto;
 import com.rob.health_tracker.dto.DailyMetricStats;
 import com.rob.health_tracker.entity.DailyMetric;
 import com.rob.health_tracker.service.DailyMetricService;
@@ -58,7 +59,13 @@ class DailyMetricControllerTest {
 
     @Test
     void getDailyMetricsLatest_returns200() throws Exception {
-        given(dailyMetricService.getLatest()).willReturn(new DailyMetric());
+        given(dailyMetricService.getLatest()).willReturn(new DailyMetricResponseDto(
+                                                        LocalDate.of(2025, 1, 1),
+                                                        165.2,
+                                                        2800,
+                                                        150
+        ));
+        
         mockMvc.perform(get("/api/daily-metrics/latest")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())

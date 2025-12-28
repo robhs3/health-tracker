@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.rob.health_tracker.dto.DailyMetricResponseDto;
 import com.rob.health_tracker.dto.DailyMetricStats;
 import com.rob.health_tracker.dto.TrendPointDto;
 import com.rob.health_tracker.dto.TrendResponseDto;
@@ -28,9 +29,21 @@ public class DailyMetricService {
         this.dailyMetricRepository = dailyMetricRepository;
     }
 
-    public List<DailyMetric> getAll() {
-        // Return all metrics, sorted by date ascending (lexicographically for now)
-        return dailyMetricRepository.findAll(Sort.by(Sort.Direction.ASC, "date"));
+    public List<DailyMetricResponseDto> getAll() {
+        // Return all metrics, sorted by date ascending
+        List<DailyMetric> metricEntities = dailyMetricRepository.findAll(Sort.by(Sort.Direction.ASC, "date"));
+        List<DailyMetricResponseDto> metricDtos = new ArrayList<>();
+
+        for (DailyMetric e : metricEntities) {
+            metricDtos.add(new DailyMetricResponseDto(
+                            e.getDate(), 
+                            e.getWeight(), 
+                            e.getCalories(), 
+                            e.getProtein()
+            ));
+        }
+
+        return metricDtos;
     }
 
     public DailyMetric add(DailyMetric metric) {
@@ -38,35 +51,55 @@ public class DailyMetricService {
         return dailyMetricRepository.save(metric);
     }
 
-    public DailyMetric getLatest() {
-        // Fetch the most recent metric by date (works best once date is a real date type)
-        return dailyMetricRepository.findTopByOrderByDateDesc();
+    public DailyMetricResponseDto getLatest() {
+        // Fetch the most recent metric by date
+        DailyMetric metricEntity = dailyMetricRepository.findTopByOrderByDateDesc();
+        
+        return new DailyMetricResponseDto(
+                    metricEntity.getDate(), 
+                    metricEntity.getWeight(), 
+                    metricEntity.getCalories(), 
+                    metricEntity.getProtein()
+        );
     }
 
-    public List<DailyMetric> getBetween(LocalDate from, LocalDate to) {
-        return dailyMetricRepository.findByDateBetweenOrderByDateAsc(from, to);
+    public List<DailyMetricResponseDto> getBetween(LocalDate from, LocalDate to) {
+        List<DailyMetric> metricEntities = dailyMetricRepository.findByDateBetweenOrderByDateAsc(from, to);
+        List<DailyMetricResponseDto> metricDtos = new ArrayList<>();
+
+        for (DailyMetric e : metricEntities) {
+            metricDtos.add(new DailyMetricResponseDto(
+                            e.getDate(), 
+                            e.getWeight(), 
+                            e.getCalories(), 
+                            e.getProtein()
+            ));
+        }
+
+        return metricDtos;
     }
 
     public DailyMetricStats getStatsBetween(LocalDate from, LocalDate to) {
-        List<DailyMetric> metrics = getBetween(from, to);
+        List<DailyMetricResponseDto> metricDtos = getBetween(from, to);
 
-        int count = metrics.size();
+        int count = metricDtos.size();
         if (count == 0) {
             return new DailyMetricStats(0, 0.0, 0.0, null, null, null);
         }
+        
+        double totalCalories = 0.0;
+        double totalProtein = 0.0;
 
-        double avgCalories = metrics.stream()
-                .mapToInt(DailyMetric::getCalories)
-                .average()
-                .orElse(0.0);
+        for (DailyMetricResponseDto m : metricDtos) {
+            totalCalories += m.calories();
+            totalProtein += m.protein();
+        }
 
-        double avgProtein = metrics.stream()
-                .mapToInt(DailyMetric::getProtein)
-                .average()
-                .orElse(0.0);
+        double avgCalories = totalCalories / count;
+        double avgProtein = totalProtein / count;
 
-        Double startWeight = metrics.get(0).getWeight();
-        Double endWeight = metrics.get(count - 1).getWeight();
+        Double startWeight = metricDtos.get(0).weight();
+        Double endWeight = metricDtos.get(count - 1).weight();
         Double weightChange = endWeight - startWeight;
 
         return new DailyMetricStats(count, avgCalories, avgProtein, startWeight, endWeight, weightChange);

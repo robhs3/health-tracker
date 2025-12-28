@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.rob.health_tracker.dto.DailyMetricResponseDto;
 import com.rob.health_tracker.dto.DailyMetricStats;
 import com.rob.health_tracker.dto.TrendResponseDto;
 import com.rob.health_tracker.entity.DailyMetric;
@@ -41,7 +42,7 @@ public class DailyMetricController {
 
     // Get all logged daily metrics
     @GetMapping("/daily-metrics")
-    public List<DailyMetric> getAllMetrics(
+    public List<DailyMetricResponseDto> getAllMetrics(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to
     ) {
@@ -53,7 +54,7 @@ public class DailyMetricController {
     }
 
     @GetMapping("/daily-metrics/latest")
-    public DailyMetric getLatestMetric() {
+    public DailyMetricResponseDto getLatestMetric() {
         return dailyMetricService.getLatest();
     }
 
