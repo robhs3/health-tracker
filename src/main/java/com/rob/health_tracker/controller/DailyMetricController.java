@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.rob.health_tracker.dto.DailyMetricRequestDto;
 import com.rob.health_tracker.dto.DailyMetricResponseDto;
 import com.rob.health_tracker.dto.DailyMetricStats;
 import com.rob.health_tracker.dto.TrendResponseDto;
@@ -35,10 +36,10 @@ public class DailyMetricController {
     @Value("${app.dev-reset-enabled:false}")
     private boolean devResetEnabled;
 
-
     public DailyMetricController(DailyMetricService dailyMetricService) {
         this.dailyMetricService = dailyMetricService;
     }
+
 
     // Get all logged daily metrics
     @GetMapping("/daily-metrics")
@@ -53,16 +54,19 @@ public class DailyMetricController {
         return dailyMetricService.getAll();
     }
 
+
     @GetMapping("/daily-metrics/latest")
     public DailyMetricResponseDto getLatestMetric() {
         return dailyMetricService.getLatest();
     }
 
+
     // Add a new daily metric (from JSON)
     @PostMapping("/daily-metrics")
-    public DailyMetric addMetric(@Valid @RequestBody DailyMetric metric) {
+    public DailyMetric addMetric(@Valid @RequestBody DailyMetricRequestDto metric) {
         return dailyMetricService.add(metric);
     }
+
 
     @GetMapping("/daily-metrics/stats")
     public DailyMetricStats getStats(
@@ -71,6 +75,7 @@ public class DailyMetricController {
     ) {
         return dailyMetricService.getStatsBetween(from, to);
     }
+
 
     @GetMapping("/trends/weight")
     public TrendResponseDto getWeightTrend(
@@ -84,6 +89,7 @@ public class DailyMetricController {
     public String health() {
         return "ok";
     }
+
 
     @DeleteMapping("/daily-metrics")
     public void deleteAllMetrics() {

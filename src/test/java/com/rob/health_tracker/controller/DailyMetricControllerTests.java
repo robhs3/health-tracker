@@ -15,6 +15,7 @@ import com.rob.health_tracker.service.DailyMetricService;
 
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import java.util.List;
 import java.time.LocalDate;
@@ -131,4 +132,22 @@ class DailyMetricControllerTest {
                 .andExpect(jsonPath("$.weightChange").value(nullValue()));      
     }
     
+
+    @Test
+    void postDailyMetric_validRequest_returns201() throws Exception {
+        String body = """
+            {
+                "date": "2025-01-01",
+                "weight": 165.2,
+                "calories": 2800,
+                "protein": 150
+            }
+            """;
+
+        mockMvc.perform(post("/api/daily-metrics")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(body))
+                .andExpect(status().isOk());
+    }
 }

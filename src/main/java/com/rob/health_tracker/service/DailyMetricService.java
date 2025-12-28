@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.rob.health_tracker.dto.DailyMetricRequestDto;
 import com.rob.health_tracker.dto.DailyMetricResponseDto;
 import com.rob.health_tracker.dto.DailyMetricStats;
 import com.rob.health_tracker.dto.TrendPointDto;
@@ -46,9 +47,16 @@ public class DailyMetricService {
         return metricDtos;
     }
 
-    public DailyMetric add(DailyMetric metric) {
+    public DailyMetric add(DailyMetricRequestDto metricRequestDto) {
+        DailyMetric entity = new DailyMetric(
+                            metricRequestDto.date(), 
+                            metricRequestDto.weight(), 
+                            metricRequestDto.calories(), 
+                            metricRequestDto.protein()
+        );
+
         // save() inserts a new row when id is null, or updates when id is present
-        return dailyMetricRepository.save(metric);
+        return dailyMetricRepository.save(entity);
     }
 
     public DailyMetricResponseDto getLatest() {
