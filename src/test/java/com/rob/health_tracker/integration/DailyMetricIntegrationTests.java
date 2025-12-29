@@ -1,6 +1,5 @@
 package com.rob.health_tracker.integration;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -12,25 +11,28 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import org.junit.jupiter.api.BeforeEach;
 
 import com.rob.health_tracker.repository.DailyMetricRepository;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.core.env.Environment;
+import org.springframework.test.context.TestPropertySource;
 
+@Transactional
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
+@TestPropertySource(properties = {
+    "spring.datasource.url=jdbc:h2:mem:healthtracker;DB_CLOSE_DELAY=-1",
+    "spring.datasource.driver-class-name=org.h2.Driver",
+    "spring.datasource.username=sa",
+    "spring.datasource.password=",
+    "spring.jpa.hibernate.ddl-auto=create-drop",
+    "spring.jpa.database-platform=org.hibernate.dialect.H2Dialect"
+})
 class DailyMetricIntegrationTests {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private DailyMetricRepository dailyMetricRepository;
-
-    @BeforeEach
-    void clearDb() {
-        dailyMetricRepository.deleteAll();
-    }
 
     @Test
     void postThenGet_persistsAndReturnsMetric() throws Exception {
