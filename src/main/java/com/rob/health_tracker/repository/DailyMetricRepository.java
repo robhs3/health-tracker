@@ -10,5 +10,6 @@ import java.util.List;
 public interface DailyMetricRepository extends JpaRepository<DailyMetric, Long> {
     DailyMetric findTopByOrderByDateDesc();
     List<DailyMetric> findByDateBetweenOrderByDateAsc(LocalDate from, LocalDate to);
+    boolean existsByDate(LocalDate date);
 
 }

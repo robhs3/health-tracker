@@ -20,6 +20,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.List;
 import java.time.LocalDate;
 import static org.mockito.ArgumentMatchers.eq;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+import static org.mockito.ArgumentMatchers.any;
 
 import static org.hamcrest.Matchers.nullValue;
 
@@ -151,6 +155,31 @@ class DailyMetricControllerTest {
                 .content(body))
                 .andExpect(status().isOk());
     }
+
+
+    @Test
+    void postDailyMetric_duplicateDate_returns409() throws Exception {
+        String body = """
+                {
+                "date": "2025-01-01",
+                "weight": 165.2,
+                "calories": 2800,
+                "protein": 150
+                }
+                """;
+
+        given(dailyMetricService.add(any()))
+                .willThrow(new ResponseStatusException(
+                HttpStatus.CONFLICT,
+                "Daily metric already exists for date 2025-01-01"
+                ));
+
+        mockMvc.perform(post("/api/daily-metrics")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(body))
+                .andExpect(status().isConflict());
+        }
 
 
     @Test

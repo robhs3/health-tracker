@@ -15,6 +15,9 @@ import com.rob.health_tracker.dto.TrendSummaryDto;
 import com.rob.health_tracker.entity.DailyMetric;
 import com.rob.health_tracker.repository.DailyMetricRepository;
 import com.rob.health_tracker.metric.MetricType;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,6 +51,13 @@ public class DailyMetricService {
     }
 
     public DailyMetric add(DailyMetricRequestDto metricRequestDto) {
+        if (dailyMetricRepository.existsByDate(metricRequestDto.date())) {
+            throw new ResponseStatusException(
+                HttpStatus.CONFLICT,
+                "Daily metric already exists for date " + metricRequestDto.date()
+            );
+        }
+
         DailyMetric entity = new DailyMetric(
                             metricRequestDto.date(), 
                             metricRequestDto.weight(), 

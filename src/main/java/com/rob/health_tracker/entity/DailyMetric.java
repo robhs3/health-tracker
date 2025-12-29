@@ -4,12 +4,21 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+
 import java.time.LocalDate;
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
 @Entity
+@Table(
+    name = "daily_metric",
+    uniqueConstraints = {
+        @UniqueConstraint(name = "uk_daily_metric_date", columnNames = {"date"})
+    }
+)
 public class DailyMetric {
 
     @Id
