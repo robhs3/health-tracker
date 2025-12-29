@@ -17,6 +17,11 @@ This project is intentionally minimal and is being developed incrementally as a 
 - SQLite integration for data persistence
 - Validation for health metric inputs
 - WebMVC controller slice tests (MockMvc) for GET endpoints (happy path)
+- Retrieve trend data for specific metrics
+- Enforces a single daily metric per date (unique constraint)
+- Request and response DTOs used to decouple API from persistence layer
+
+
 ---
 
 ## API Endpoints
@@ -47,9 +52,16 @@ Example request body:
   "protein": 180
 }
 ```
+Note: Only one entry per date is allowed. Duplicate dates return HTTP 409.
+
 
 ### Get Health Stats Between Dates
 `GET /api/daily-metrics/stats?from=YYYY-MM-DD&to=YYYY-MM-DD`
+
+### Get Metric Trends Between Dates
+`GET /api/trends/{metric}?from=YYYY-MM-DD&to=YYYY-MM-DD`
+
+- Replace `{metric}` with either `weight`, `calories`, or `protein`
 
 ## Tech Stack
 - Java 17
@@ -69,6 +81,11 @@ http://localhost:8080
 
 ## Testing
 Controller-level WebMVC slice tests are implemented for GET endpoints to validate routing, parameter binding, and successful responses using mocked service dependencies.
+
+## Error Handling
+- 400 Bad Request for invalid input or date ranges
+- 409 Conflict for duplicate daily metric entries
+
 
 ## Future Improvements
 - Build a simple frontend for data entry and visualization
