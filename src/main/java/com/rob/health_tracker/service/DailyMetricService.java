@@ -1,9 +1,8 @@
 package com.rob.health_tracker.service;
 
-import org.apache.coyote.BadRequestException;
+
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -15,6 +14,7 @@ import com.rob.health_tracker.dto.TrendResponseDto;
 import com.rob.health_tracker.dto.TrendSummaryDto;
 import com.rob.health_tracker.entity.DailyMetric;
 import com.rob.health_tracker.repository.DailyMetricRepository;
+import com.rob.health_tracker.metric.MetricType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -113,7 +113,7 @@ public class DailyMetricService {
         return new DailyMetricStats(count, avgCalories, avgProtein, startWeight, endWeight, weightChange);
     }
 
-    public TrendResponseDto getWeightTrend(LocalDate from, LocalDate to) {
+    public TrendResponseDto getTrend(MetricType metric, LocalDate from, LocalDate to) {
         if (from.isAfter(to)) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
@@ -121,16 +121,30 @@ public class DailyMetricService {
             );
         }
 
-        List<DailyMetric> metrics = dailyMetricRepository.findByDateBetweenOrderByDateAsc(from, to);
+        List<DailyMetricResponseDto> metrics = getBetween(from, to);
 
         if (metrics.size() == 0) {
-            return new TrendResponseDto("weight", from, to, null, null);
+            return new TrendResponseDto(metric.name().toLowerCase(), from, to, null, null);
         }
 
         List<TrendPointDto> points = new ArrayList<>();
+        double value;
+        for (DailyMetricResponseDto m : metrics) {
+            switch (metric) {
+                case WEIGHT:
+                    value = m.weight();
+                    break;
+                case CALORIES:
+                    value = m.calories();
+                    break;
+                case PROTEIN:
+                    value = m.protein();
+                    break;
+                default:
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unsupported metric: " + metric);
+}
 
-        for (DailyMetric m : metrics) {
-            TrendPointDto point = new TrendPointDto(m.getDate(), m.getWeight());
+            TrendPointDto point = new TrendPointDto(m.date(), value);
             points.add(point);
         }
         
@@ -138,7 +152,7 @@ public class DailyMetricService {
         double end = points.get((points.size() - 1)).getValue();
 
         TrendSummaryDto summary = new TrendSummaryDto(start, end, end - start);
-        return new TrendResponseDto("weight", from, to, points, summary);
+        return new TrendResponseDto(metric.name().toLowerCase(), from, to, points, summary);
     }
     
     public void deleteAll() {

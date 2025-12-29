@@ -6,19 +6,20 @@ import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-
-import com.rob.health_tracker.controller.DailyMetricController;
 import com.rob.health_tracker.dto.DailyMetricResponseDto;
 import com.rob.health_tracker.dto.DailyMetricStats;
-import com.rob.health_tracker.entity.DailyMetric;
 import com.rob.health_tracker.service.DailyMetricService;
-
+import com.rob.health_tracker.dto.TrendPointDto;
+import com.rob.health_tracker.dto.TrendResponseDto;
+import com.rob.health_tracker.dto.TrendSummaryDto;
+import com.rob.health_tracker.metric.MetricType;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import java.util.List;
 import java.time.LocalDate;
+import static org.mockito.ArgumentMatchers.eq;
 
 import static org.hamcrest.Matchers.nullValue;
 
@@ -134,7 +135,7 @@ class DailyMetricControllerTest {
     
 
     @Test
-    void postDailyMetric_validRequest_returns201() throws Exception {
+    void postDailyMetric_validRequest_returns200() throws Exception {
         String body = """
             {
                 "date": "2025-01-01",
@@ -149,5 +150,71 @@ class DailyMetricControllerTest {
                 .accept(MediaType.APPLICATION_JSON)
                 .content(body))
                 .andExpect(status().isOk());
+    }
+
+
+    @Test
+    void getTrend_weight_validRequest_returns200_andBody() throws Exception {
+        var from = LocalDate.parse("2025-01-01");
+        var to = LocalDate.parse("2025-01-03");
+
+        var points = List.of(
+                new TrendPointDto(LocalDate.parse("2025-01-01"), 165.0),
+                new TrendPointDto(LocalDate.parse("2025-01-03"), 166.0)
+        );
+        var summary = new TrendSummaryDto(165.0, 166.0, 1.0);
+
+        given(dailyMetricService.getTrend(eq(MetricType.WEIGHT), eq(from), eq(to)))
+                .willReturn(new TrendResponseDto("weight", from, to, points, summary));
+
+        mockMvc.perform(get("/api/trends/weight")
+                .param("from", from.toString())
+                .param("to", to.toString())
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+
+                .andExpect(jsonPath("$.metric").value("weight"))
+                .andExpect(jsonPath("$.from").value("2025-01-01"))
+                .andExpect(jsonPath("$.to").value("2025-01-03"))
+
+                .andExpect(jsonPath("$.points").isArray())
+                .andExpect(jsonPath("$.points.length()").value(2))
+                .andExpect(jsonPath("$.points[0].date").value("2025-01-01"))
+                .andExpect(jsonPath("$.points[0].value").value(165.0))
+                .andExpect(jsonPath("$.points[1].date").value("2025-01-03"))
+                .andExpect(jsonPath("$.points[1].value").value(166.0))
+
+                .andExpect(jsonPath("$.summary.start").value(165.0))
+                .andExpect(jsonPath("$.summary.end").value(166.0))
+                .andExpect(jsonPath("$.summary.change").value(1.0));
+    }
+
+
+    @Test
+    void getTrend_weight_noData_returns200_withNullPointsAndSummary() throws Exception {
+        var from = LocalDate.parse("2025-01-01");
+        var to = LocalDate.parse("2025-01-03");
+
+        given(dailyMetricService.getTrend(eq(MetricType.WEIGHT), eq(from), eq(to)))
+                .willReturn(new TrendResponseDto("weight", from, to, null, null));
+
+        mockMvc.perform(get("/api/trends/weight")
+                .param("from", from.toString())
+                .param("to", to.toString())
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.points").value(nullValue()))
+                .andExpect(jsonPath("$.summary").value(nullValue()));
+    }
+
+
+    @Test
+    void getTrend_invalidMetric_returns400() throws Exception {
+        mockMvc.perform(get("/api/trends/notametric")
+                .param("from", "2025-01-01")
+                .param("to", "2025-01-03")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 }

@@ -18,11 +18,12 @@ import com.rob.health_tracker.dto.DailyMetricStats;
 import com.rob.health_tracker.dto.TrendResponseDto;
 import com.rob.health_tracker.entity.DailyMetric;
 import com.rob.health_tracker.service.DailyMetricService;
+import com.rob.health_tracker.metric.MetricType;
 
 import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.RequestParam;
-
+import org.springframework.web.bind.annotation.PathVariable;
 import java.time.LocalDate;
 
 
@@ -77,14 +78,27 @@ public class DailyMetricController {
     }
 
 
-    @GetMapping("/trends/weight")
-    public TrendResponseDto getWeightTrend(
+    @GetMapping("/trends/{metric}")
+    public TrendResponseDto getTrend(
+            @PathVariable String metric,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to
     ) {
-        return dailyMetricService.getWeightTrend(from, to);
+        
+        MetricType metricType;
+        try {
+            metricType = MetricType.valueOf(metric.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Unsupported metric: " + metric
+            );
+        }
+
+        return dailyMetricService.getTrend(metricType, from, to);
     }
 
+    
     @GetMapping("/health")
     public String health() {
         return "ok";
