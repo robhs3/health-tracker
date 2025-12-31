@@ -18,13 +18,18 @@ import com.rob.health_tracker.dto.DailyMetricStats;
 import com.rob.health_tracker.dto.TrendResponseDto;
 import com.rob.health_tracker.entity.DailyMetric;
 import com.rob.health_tracker.service.DailyMetricService;
+import com.rob.health_tracker.util.CsvDailyMetricRow;
+import com.rob.health_tracker.util.DailyMetricCsvParser;
 import com.rob.health_tracker.metric.MetricType;
+import com.rob.health_tracker.service.DailyMetricCsvImportService;
 
 import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PathVariable;
 import java.time.LocalDate;
+import java.io.IOException;
+import java.nio.file.Path;
 
 
 
@@ -33,12 +38,20 @@ import java.time.LocalDate;
 public class DailyMetricController {
 
     private final DailyMetricService dailyMetricService;
+    private final DailyMetricCsvImportService dailyMetricCsvImportService;
 
     @Value("${app.dev-reset-enabled:false}")
     private boolean devResetEnabled;
 
-    public DailyMetricController(DailyMetricService dailyMetricService) {
+    @Value("${app.dev-import-enabled:false}")
+    private boolean devImportEnabled;
+
+    public DailyMetricController(
+        DailyMetricService dailyMetricService,
+        DailyMetricCsvImportService dailyMetricCsvImportService
+    ) {
         this.dailyMetricService = dailyMetricService;
+        this.dailyMetricCsvImportService = dailyMetricCsvImportService;
     }
 
 
@@ -66,6 +79,20 @@ public class DailyMetricController {
     @PostMapping("/daily-metrics")
     public DailyMetric addMetric(@Valid @RequestBody DailyMetricRequestDto metric) {
         return dailyMetricService.add(metric);
+    }
+
+
+    @PostMapping("/dev/import/daily-metrics")
+    public void importDailyMetrics() throws IOException {
+        if (!devImportEnabled) {
+            throw new ResponseStatusException(
+                HttpStatus.FORBIDDEN,
+                "Dev import endpoint is disabled"
+            );
+        }
+
+        Path path = Path.of("src/main/resources/daily-metrics.csv");
+        dailyMetricCsvImportService.importFromCsv(path);
     }
 
 
@@ -111,6 +138,15 @@ public class DailyMetricController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Dev reset endpoint is disabled");
         }
         dailyMetricService.deleteAll();
+
+        // // TEMPORARY IMPORT LOGIC
+        // Path path = Path.of("src/main/resources/daily-metrics.csv");
+        // try {
+        // dailyMetricCsvImportService.importFromCsv(path);
+        // }
+        // catch (IOException e) {}
+        
+        
     }
 
 
